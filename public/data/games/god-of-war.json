@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "slug": "god-of-war",
+  "name": "God of War",
+  "platform": "PS3",
+  "scrapedAt": "2026-09-17T15:46:58.702Z",
+  "cover": null,
+  "developers": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "publishers": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "summary": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "autopop": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "difficulty": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "communityDifficulty": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "timeHours": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "offlineTrophies": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "onlineTrophies": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "missableTrophies": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "glitchedTrophies": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "difficultyAffects": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "playthroughs": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "unobtainable": {
+    "flag": false,
+    "reason": null,
+    "notes": []
+  },
+  "tips": [],
+  "guides": [
+    {
+      "site": "PSNProfiles",
+      "title": "Buscar lista de troféus",
+      "url": "https://psnprofiles.com/search/games?q=God%20of%20War",
+      "lang": "en"
+    },
+    {
+      "site": "PSNProfiles",
+      "title": "Buscar guias",
+      "url": "https://psnprofiles.com/search/guides?q=God%20of%20War",
+      "lang": "en"
+    },
+    {
+      "site": "PlayStationTrophies",
+      "title": "Buscar guia",
+      "url": "https://www.playstationtrophies.org/search/?q=God%20of%20War",
+      "lang": "en"
+    },
+    {
+      "site": "TrueTrophies",
+      "title": "Buscar guia",
+      "url": "https://www.truetrophies.com/searchresults.aspx?search=God%20of%20War",
+      "lang": "en"
+    },
+    {
+      "site": "Reddit r/Trophies",
+      "title": "Discussões",
+      "url": "https://www.reddit.com/r/Trophies/search/?q=God%20of%20War&restrict_sr=1",
+      "lang": "en"
+    }
+  ],
+  "videos": [
+    {
+      "channel": "PowerPyx",
+      "url": "https://www.youtube.com/@PowerPyx/search?query=God%20of%20War",
+      "title": "Buscar no canal"
+    },
+    {
+      "channel": "Dan Allen Gaming",
+      "url": "https://www.youtube.com/@DanAllenGaming/search?query=God%20of%20War",
+      "title": "Buscar no canal"
+    },
+    {
+      "channel": "YouTube (PT-BR)",
+      "url": "https://www.youtube.com/results?search_query=God%20of%20War%20guia%20de%20trof%C3%A9us%20platina",
+      "title": "Buscar \"guia de troféus\""
+    },
+    {
+      "channel": "YouTube (EN)",
+      "url": "https://www.youtube.com/results?search_query=God%20of%20War%20trophy%20guide",
+      "title": "Buscar \"trophy guide\""
+    }
+  ],
+  "maps": [],
+  "sources": [
+    {
+      "site": "powerpyx",
+      "url": null,
+      "ok": false,
+      "error": "Guia não encontrado"
+    },
+    {
+      "site": "psnprofiles",
+      "url": null,
+      "ok": false,
+      "error": "Bloqueia coleta automática (Cloudflare). Use os links."
+    },
+    {
+      "site": "mypst",
+      "url": null,
+      "ok": false,
+      "error": "Nenhum \"Guia de Troféus\" no fórum"
+    },
+    {
+      "site": "psxtrophies",
+      "url": null,
+      "ok": false,
+      "error": "fetch failed"
+    }
+  ]
+}
