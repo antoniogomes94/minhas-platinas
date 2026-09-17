@@ -1,83 +1,179 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Check, Heart, ListPlus, Plus, RefreshCw, Search, Trash2 } from 'lucide-react'
+import { Check, Heart, ListPlus, LoaderCircle, Plus, RefreshCw, Search, Trash2, X } from 'lucide-react'
 import { useAppStore } from '../store/useAppStore'
 import { toast } from '../store/useToastStore'
 import { useGameInfo } from '../lib/gameData'
 import { useStartScrape } from '../lib/github'
 import { Cover } from '../components/Cover'
+import { GameSearch } from '../components/GameSearch'
+import { catalogFromSuggestion, fetchCatalog, type Suggestion } from '../lib/rawg'
+import { coverOf } from '../lib/cover'
 import { DifficultyChip, FetchStatusChip, HoursChip, UnobtainableRibbon } from '../components/badges'
-import { BACKLOG_LIMIT, PLATFORMS, type Game, type Platform } from '../types'
+import { BACKLOG_LIMIT, PLATFORMS, type CatalogInfo, type Game, type Platform } from '../types'
 
 function AddGameForm() {
   const addGame = useAppStore((s) => s.addGame)
   const hasToken = useAppStore((s) => !!s.settings.githubToken)
+  const rawgKey = useAppStore((s) => s.settings.rawgKey)
   const startScrape = useStartScrape()
   const [name, setName] = useState('')
   const [platform, setPlatform] = useState<Platform | ''>('')
   const [autoFetch, setAutoFetch] = useState(true)
+  const [picked, setPicked] = useState<Suggestion | null>(null)
+  const [catalog, setCatalog] = useState<CatalogInfo | null>(null)
+  const [detailsLoading, setDetailsLoading] = useState(false)
+  const detailsAbort = useRef<AbortController | null>(null)
 
-  function submit(e: FormEvent) {
-    e.preventDefault()
-    const result = addGame(name, platform || undefined)
+  function clearPick() {
+    detailsAbort.current?.abort()
+    setPicked(null)
+    setCatalog(null)
+    setDetailsLoading(false)
+  }
+
+  async function pick(s: Suggestion) {
+    clearPick()
+    setPicked(s)
+    setName(s.name)
+    setPlatform(s.platforms[0] ?? '')
+    if (!rawgKey) return
+    const controller = new AbortController()
+    detailsAbort.current = controller
+    setDetailsLoading(true)
+    try {
+      setCatalog(await fetchCatalog(rawgKey, s.id, controller.signal))
+    } catch (err) {
+      if (!controller.signal.aborted) {
+        toast(`Não deu para carregar developer e publisher: ${err instanceof Error ? err.message : err}`, 'error')
+      }
+    } finally {
+      if (!controller.signal.aborted) setDetailsLoading(false)
+    }
+  }
+
+  function add() {
+    const info = picked ? (catalog ?? catalogFromSuggestion(picked)) : undefined
+    const result = addGame(name, platform || undefined, info)
     if (!result.ok) {
       toast(result.error, 'error')
       return
     }
     setName('')
+    clearPick()
     toast(`"${result.game.name}" adicionado à lista de desejos.`, 'success')
     if (autoFetch && hasToken) void startScrape(result.game)
   }
 
+  function submit(e: FormEvent) {
+    e.preventDefault()
+    if (name.trim() && !detailsLoading) add()
+  }
+
+  // Com sugestão escolhida, só as plataformas em que o jogo existe.
+  const platformOptions = picked?.platforms.length ? picked.platforms : PLATFORMS
+  const details = catalog ?? (picked ? catalogFromSuggestion(picked) : null)
+
   return (
-    <form onSubmit={submit} className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-end">
-      <div className="flex-1">
-        <label htmlFor="game-name" className="label">
-          Nome do jogo
-        </label>
-        <input
-          id="game-name"
-          className="input"
-          placeholder="Ex.: Ghost of Tsushima"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          autoComplete="off"
-        />
-      </div>
-      <div className="sm:w-32">
-        <label htmlFor="game-platform" className="label">
-          Plataforma
-        </label>
-        <select
-          id="game-platform"
-          className="input"
-          value={platform}
-          onChange={(e) => setPlatform(e.target.value as Platform | '')}
-        >
-          <option value="">—</option>
-          {PLATFORMS.map((p) => (
-            <option key={p}>{p}</option>
-          ))}
-        </select>
-      </div>
-      <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-start sm:gap-1">
-        <label
-          className={`flex items-center gap-2 text-xs ${hasToken ? 'text-muted' : 'text-muted/50'}`}
-          title={hasToken ? undefined : 'Configure o token do GitHub no Perfil'}
-        >
-          <input
-            type="checkbox"
-            checked={autoFetch && hasToken}
-            disabled={!hasToken}
-            onChange={(e) => setAutoFetch(e.target.checked)}
-            className="accent-ps"
+    <form onSubmit={submit} className="card relative z-20 space-y-3 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex-1">
+          <label htmlFor="game-name" className="label">
+            Nome do jogo
+          </label>
+          <GameSearch
+            id="game-name"
+            apiKey={rawgKey}
+            value={name}
+            placeholder={rawgKey ? 'Comece a digitar: Ghost of Tsu…' : 'Ex.: Ghost of Tsushima'}
+            onChange={(v) => {
+              setName(v)
+              if (picked && v !== picked.name) clearPick()
+            }}
+            onPick={(s) => void pick(s)}
+            onSubmitText={() => name.trim() && !detailsLoading && add()}
           />
-          Buscar dados ao adicionar
-        </label>
-        <button type="submit" className="btn-primary" disabled={!name.trim()}>
-          <Plus size={16} /> Adicionar
-        </button>
+        </div>
+        <div className="sm:w-32">
+          <label htmlFor="game-platform" className="label">
+            Plataforma
+          </label>
+          <select
+            id="game-platform"
+            className="input"
+            value={platform}
+            onChange={(e) => setPlatform(e.target.value as Platform | '')}
+          >
+            <option value="">—</option>
+            {platformOptions.map((p) => (
+              <option key={p}>{p}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-start sm:gap-1">
+          <label
+            className={`flex items-center gap-2 text-xs ${hasToken ? 'text-muted' : 'text-muted/50'}`}
+            title={hasToken ? undefined : 'Configure o token do GitHub no Perfil'}
+          >
+            <input
+              type="checkbox"
+              checked={autoFetch && hasToken}
+              disabled={!hasToken}
+              onChange={(e) => setAutoFetch(e.target.checked)}
+              className="accent-ps"
+            />
+            Buscar dados ao adicionar
+          </label>
+          <button type="submit" className="btn-primary" disabled={!name.trim() || detailsLoading}>
+            {detailsLoading ? <LoaderCircle size={16} className="animate-spin" /> : <Plus size={16} />} Adicionar
+          </button>
+        </div>
       </div>
+
+      {picked && details && (
+        <div className="flex gap-4 rounded-xl border border-ps-light/30 bg-ps/5 p-3">
+          <div className="hidden aspect-video w-40 shrink-0 overflow-hidden rounded-lg bg-surface-2 sm:block">
+            {picked.thumb && <img src={picked.thumb} alt="" className="h-full w-full object-cover" />}
+          </div>
+          <div className="min-w-0 flex-1 space-y-1 text-sm">
+            <p className="font-semibold">
+              {details.name}
+              {picked.year && <span className="ml-2 font-normal text-muted">{picked.year}</span>}
+              {details.metacritic != null && (
+                <span className="ml-2 rounded border border-line px-1.5 text-xs text-muted">Metacritic {details.metacritic}</span>
+              )}
+            </p>
+            {detailsLoading ? (
+              <p className="flex items-center gap-2 text-muted">
+                <LoaderCircle size={14} className="animate-spin" /> Carregando developer e publisher…
+              </p>
+            ) : (
+              <>
+                <p className="text-muted">
+                  <span className="text-ink/80">Developer:</span> {details.developers.join(', ') || '—'}
+                </p>
+                <p className="text-muted">
+                  <span className="text-ink/80">Publisher:</span> {details.publishers.join(', ') || '—'}
+                </p>
+              </>
+            )}
+            {details.genres.length > 0 && <p className="text-xs text-muted">{details.genres.join(' · ')}</p>}
+          </div>
+          <button type="button" onClick={clearPick} className="self-start text-muted hover:text-ink" aria-label="Desfazer escolha">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      {!rawgKey && (
+        <p className="text-xs text-muted">
+          Quer sugestões com capa, developer e publisher enquanto digita?{' '}
+          <Link to="/perfil" className="text-ps-light hover:underline">
+            Cole uma chave grátis do RAWG no Perfil
+          </Link>
+          .
+        </p>
+      )}
     </form>
   )
 }
@@ -101,7 +197,7 @@ function GameCard({ game, backlogPos }: { game: Game; backlogPos: number }) {
     <article className="card group relative flex flex-col overflow-hidden">
       <Link to={`/jogo/${game.id}`} className="relative block aspect-[16/9] overflow-hidden">
         <Cover
-          src={game.coverUrl || info?.cover}
+          src={coverOf(game, info)}
           name={game.name}
           className="h-full w-full transition duration-300 group-hover:scale-105"
         />

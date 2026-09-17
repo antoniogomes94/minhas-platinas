@@ -8,7 +8,8 @@ import {
   parseDifficulty,
   parseHours,
   parseYesNo,
-  sameName,
+  matchesName,
+  searchName,
   shortSummary,
   splitSentences,
   textLines,
@@ -40,7 +41,7 @@ export function pickSearchResult(html: string, name: string): string | null {
   for (const a of $('.ipsStreamItem_title a').toArray()) {
     const game = guideTitleGame($(a).text().trim())
     const href = $(a).attr('href')
-    if (game && href && sameName(game, name)) return href.replace(/&do=findComment.*$/, '')
+    if (game && href && matchesName(game, name)) return href.replace(/&do=findComment.*$/, '')
   }
   return null
 }
@@ -158,7 +159,7 @@ export function parseGuide(html: string, url: string): SourceResult {
 }
 
 export async function scrapeMypst(input: ScrapeInput): Promise<SourceResult> {
-  const url = input.urls.mypst ?? pickSearchResult(await fetchText(searchUrl(input.name)), input.name)
+  const url = input.urls.mypst ?? pickSearchResult(await fetchText(searchUrl(searchName(input.name))), input.name)
   if (!url) return { ...emptyResult('mypst'), error: 'Nenhum "Guia de Troféus" no fórum' }
   return parseGuide(await fetchText(url), url)
 }

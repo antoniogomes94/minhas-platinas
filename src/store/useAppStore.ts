@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import {
   BACKLOG_LIMIT,
+  type CatalogInfo,
   type Game,
   type GameFetch,
   type PersistedState,
@@ -20,7 +21,7 @@ export type AddGameResult = { ok: true; game: Game } | { ok: false; error: strin
 interface Actions {
   setProfile: (profile: Profile) => void
   setSettings: (settings: Settings) => void
-  addGame: (name: string, platform?: Platform) => AddGameResult
+  addGame: (name: string, platform?: Platform, catalog?: CatalogInfo) => AddGameResult
   updateGame: (id: string, patch: Partial<Omit<Game, 'id' | 'slug' | 'addedAt'>>) => void
   setSourceUrls: (id: string, urls: Partial<Record<SourceSite, string>>) => void
   setFetch: (id: string, fetch: GameFetch) => void
@@ -65,7 +66,7 @@ export const useAppStore = create<AppStore>()(
 
       setSettings: (settings) => set({ settings }),
 
-      addGame: (rawName, platform) => {
+      addGame: (rawName, platform, catalog) => {
         const name = rawName.trim()
         const slug = slugify(name)
         if (!slug) return { ok: false, error: 'Informe o nome do jogo.' }
@@ -76,6 +77,7 @@ export const useAppStore = create<AppStore>()(
           slug,
           name,
           platform,
+          ...(catalog ? { catalog } : {}),
           fetch: { status: 'idle' },
           addedAt: new Date().toISOString(),
         }

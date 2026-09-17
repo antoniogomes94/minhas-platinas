@@ -22,6 +22,7 @@ import { useAppStore } from '../store/useAppStore'
 import { toast } from '../store/useToastStore'
 import { useGameInfo } from '../lib/gameData'
 import { Cover } from '../components/Cover'
+import { coverOf } from '../lib/cover'
 import { DifficultyChip, FetchStatusChip, HoursChip, OnlineChip, UnobtainableRibbon } from '../components/badges'
 import { BACKLOG_LIMIT, type Game } from '../types'
 
@@ -64,7 +65,7 @@ function BacklogBanner({ game, position }: { game: Game; position: number }) {
         } transition-[transform,box-shadow,border-color]`}
       >
         {/* capa ocupando o banner inteiro */}
-        <Cover src={game.coverUrl || info?.cover} name={game.name} className="absolute inset-0 h-full w-full" />
+        <Cover src={coverOf(game, info)} name={game.name} className="absolute inset-0 h-full w-full" />
         <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/85 to-bg/10" />
         {info?.unobtainable.flag && <UnobtainableRibbon reason={info.unobtainable.reason} />}
 

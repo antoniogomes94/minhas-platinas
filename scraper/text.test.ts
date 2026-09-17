@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   classifyTip,
   detectUnobtainable,
+  matchesName,
+  nameVariants,
   parseAutopop,
   parseCount,
   parseDifficulty,
@@ -111,5 +113,18 @@ describe('describeError', async () => {
     expect(describeError(err)).toBe('Falha de conexão (ECONNRESET)')
     expect(describeError(new HttpError(403, 'https://x'))).toBe('HTTP 403 em https://x')
     expect(describeError(new DOMException('t', 'TimeoutError'))).toBe('Tempo esgotado ao acessar o site')
+  })
+})
+
+describe('variações de nome', () => {
+  it('remove o ano entre parênteses do fim', () => {
+    expect(nameVariants('God of War (2018)')).toEqual(['God of War (2018)', 'God of War'])
+    expect(nameVariants('Ghost of Tsushima')).toEqual(['Ghost of Tsushima'])
+    expect(nameVariants('Batman: Arkham Knight (Game of the Year)')).toEqual(['Batman: Arkham Knight (Game of the Year)'])
+    expect(nameVariants("Ghost of Tsushima Director's Cut")).toEqual(["Ghost of Tsushima Director's Cut", 'Ghost of Tsushima'])
+    expect(nameVariants('Horizon Zero Dawn - Complete Edition')).toEqual(['Horizon Zero Dawn - Complete Edition', 'Horizon Zero Dawn'])
+    expect(nameVariants('The Last of Us Remastered')).toEqual(['The Last of Us Remastered'])
+    expect(matchesName('God of War', 'God of War (2018)')).toBe(true)
+    expect(matchesName('God of War III', 'God of War (2018)')).toBe(false)
   })
 })

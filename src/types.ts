@@ -27,11 +27,30 @@ export interface GameFetch {
   error?: string
 }
 
+/** Dados básicos do catálogo (RAWG) salvos no momento do cadastro. */
+export interface CatalogInfo {
+  source: 'rawg'
+  id: number
+  slug: string
+  name: string
+  released: string | null
+  /** Imagem 16:9 já redimensionada */
+  image: string | null
+  developers: string[]
+  publishers: string[]
+  genres: string[]
+  /** Plataformas PlayStation em que o jogo existe */
+  platforms: Platform[]
+  metacritic: number | null
+  website: string | null
+}
+
 export interface Game {
   id: string
   slug: string
   name: string
   platform?: Platform
+  catalog?: CatalogInfo
   coverUrl?: string
   /** Links corrigidos manualmente; quando presentes o crawler não faz busca naquele site. */
   sourceUrls?: Partial<Record<SourceSite, string>>
@@ -49,6 +68,8 @@ export interface Settings {
   githubOwner: string
   githubRepo: string
   githubToken?: string
+  /** Chave da API do RAWG para sugestões de jogos */
+  rawgKey?: string
 }
 
 export interface PersistedState {

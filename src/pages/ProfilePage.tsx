@@ -1,9 +1,10 @@
 import { useRef, useState, type FormEvent } from 'react'
-import { Download, ExternalLink, KeyRound, Save, ShieldAlert, Upload, User } from 'lucide-react'
+import { Download, ExternalLink, KeyRound, LoaderCircle, Save, Search, ShieldAlert, Upload, User } from 'lucide-react'
 import { selectPersisted, useAppStore } from '../store/useAppStore'
 import { toast } from '../store/useToastStore'
 import { backupFileName, createBackup, parseBackup } from '../store/backup'
 import { actionsUrl } from '../lib/github'
+import { RAWG_KEY_URL, RAWG_URL, searchGames } from '../lib/rawg'
 import type { PersistedState, Profile, Settings } from '../types'
 
 function Section({ title, icon: Icon, children }: { title: string; icon: typeof User; children: React.ReactNode }) {
@@ -67,6 +68,7 @@ function GithubForm() {
   function submit(e: FormEvent) {
     e.preventDefault()
     setSettings({
+      ...useAppStore.getState().settings,
       githubOwner: draft.githubOwner.trim(),
       githubRepo: draft.githubRepo.trim(),
       githubToken: draft.githubToken?.trim() || undefined,
@@ -154,6 +156,76 @@ function GithubForm() {
   )
 }
 
+function RawgForm() {
+  const settings = useAppStore((s) => s.settings)
+  const setSettings = useAppStore((s) => s.setSettings)
+  const [key, setKey] = useState(settings.rawgKey ?? '')
+  const [status, setStatus] = useState<'idle' | 'testing' | 'ok' | 'error'>('idle')
+  const [message, setMessage] = useState('')
+
+  async function submit(e: FormEvent) {
+    e.preventDefault()
+    const trimmed = key.trim()
+    setSettings({ ...useAppStore.getState().settings, rawgKey: trimmed || undefined })
+    if (!trimmed) {
+      setStatus('idle')
+      toast('Chave do RAWG removida.', 'info')
+      return
+    }
+    // Testa a chave com uma busca real.
+    setStatus('testing')
+    try {
+      const found = await searchGames(trimmed, 'astro bot')
+      setStatus('ok')
+      setMessage(`Chave funcionando (${found.length} resultados de teste).`)
+      toast('Chave do RAWG salva.', 'success')
+    } catch (err) {
+      setStatus('error')
+      setMessage(err instanceof Error ? err.message : String(err))
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      <p className="text-sm text-muted">
+        Com uma chave do{' '}
+        <a href={RAWG_URL} target="_blank" rel="noreferrer" className="text-ps-light hover:underline">
+          RAWG
+        </a>
+        , o cadastro sugere jogos enquanto você digita e já salva capa, developer, publisher, lançamento e gêneros. A chave
+        é grátis: crie uma conta e clique em "Get API Key" em{' '}
+        <a href={RAWG_KEY_URL} target="_blank" rel="noreferrer" className="text-ps-light hover:underline">
+          rawg.io/apidocs
+        </a>
+        .
+      </p>
+      <div>
+        <label htmlFor="rawg-key" className="label">
+          Chave da API
+        </label>
+        <input
+          id="rawg-key"
+          className="input font-mono"
+          placeholder="32 caracteres"
+          autoComplete="off"
+          value={key}
+          onChange={(e) => {
+            setKey(e.target.value)
+            setStatus('idle')
+          }}
+        />
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="submit" className="btn-primary" disabled={status === 'testing'}>
+          {status === 'testing' ? <LoaderCircle size={16} className="animate-spin" /> : <Save size={16} />} Salvar e testar
+        </button>
+        {status === 'ok' && <span className="text-sm text-ok">{message}</span>}
+        {status === 'error' && <span className="text-sm text-danger">{message}</span>}
+      </div>
+    </form>
+  )
+}
+
 function BackupSection() {
   const [includeToken, setIncludeToken] = useState(false)
   const [pending, setPending] = useState<{ data: PersistedState; exportedAt: string; fileName: string } | null>(null)
@@ -186,8 +258,15 @@ function BackupSection() {
     if (!pending) return
     const current = useAppStore.getState().settings
     const data = pending.data
-    // Mantém o token atual se o backup não trouxer um.
-    replaceAll({ ...data, settings: { ...data.settings, githubToken: data.settings.githubToken ?? current.githubToken } })
+    // Mantém as chaves atuais se o backup não trouxer.
+    replaceAll({
+      ...data,
+      settings: {
+        ...data.settings,
+        githubToken: data.settings.githubToken ?? current.githubToken,
+        rawgKey: data.settings.rawgKey ?? current.rawgKey,
+      },
+    })
     setPending(null)
     toast('Backup importado.', 'success')
   }
@@ -220,7 +299,7 @@ function BackupSection() {
             checked={includeToken}
             onChange={(e) => setIncludeToken(e.target.checked)}
           />
-          Incluir o token do GitHub
+          Incluir as chaves (GitHub e RAWG)
         </label>
       </div>
 
@@ -257,6 +336,9 @@ export function ProfilePage() {
       </Section>
       <Section title="Backup" icon={Download}>
         <BackupSection />
+      </Section>
+      <Section title="Sugestões de jogos (RAWG)" icon={Search}>
+        <RawgForm />
       </Section>
       <Section title="GitHub (busca de dados)" icon={KeyRound}>
         <GithubForm />

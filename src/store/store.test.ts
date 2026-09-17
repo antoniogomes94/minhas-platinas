@@ -34,6 +34,27 @@ describe('lista de desejos', () => {
     expect(store().games).toHaveLength(1)
   })
 
+  it('guarda os dados do catálogo no cadastro', () => {
+    const catalog = {
+      source: 'rawg' as const,
+      id: 1,
+      slug: 'astro-bot',
+      name: 'Astro Bot',
+      released: '2024-09-06',
+      image: 'https://media.rawg.io/media/resize/1280/-/games/a/b.jpg',
+      developers: ['Team Asobi'],
+      publishers: ['Sony Interactive Entertainment'],
+      genres: ['Platformer'],
+      platforms: ['PS5' as const],
+      metacritic: 94,
+      website: null,
+    }
+    const r = store().addGame('Astro Bot', 'PS5', catalog)
+    expect(r.ok && r.game.catalog?.developers).toEqual(['Team Asobi'])
+    const parsed = parseBackup(createBackup(selectPersisted(store())))
+    expect(parsed.ok && parsed.data.games[0]?.catalog?.metacritic).toBe(94)
+  })
+
   it('rejeita nome vazio', () => {
     expect(store().addGame('   ').ok).toBe(false)
   })
@@ -94,11 +115,12 @@ describe('backup', () => {
     const [a] = addGames(2)
     store().addToBacklog(a.id)
     store().setProfile({ name: 'Antonio', email: 'a@b.com', psnId: 'antonio_psn' })
-    store().setSettings({ githubOwner: 'antonio', githubRepo: 'minhas-platinas', githubToken: 'secreto' })
+    store().setSettings({ githubOwner: 'antonio', githubRepo: 'minhas-platinas', githubToken: 'secreto', rawgKey: 'chave-rawg' })
 
     const text = createBackup(selectPersisted(store()))
     expect(text).not.toContain('secreto')
-    expect(createBackup(selectPersisted(store()), true)).toContain('secreto')
+    expect(text).not.toContain('chave-rawg')
+    expect(createBackup(selectPersisted(store()), true)).toContain('chave-rawg')
 
     const parsed = parseBackup(text)
     expect(parsed.ok).toBe(true)

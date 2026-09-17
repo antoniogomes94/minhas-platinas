@@ -45,10 +45,10 @@ export function OnlineChip({ count }: { count: number }) {
   )
 }
 
-export function SourceBadge({ site }: { site: SourceSite }) {
+export function SourceBadge({ site }: { site: SourceSite | 'rawg' }) {
   return (
     <span className="rounded border border-line bg-surface-2 px-1.5 py-px text-[10px] font-medium tracking-wide text-muted uppercase">
-      {SITE_LABELS[site]}
+      {site === 'rawg' ? 'RAWG' : SITE_LABELS[site]}
     </span>
   )
 }

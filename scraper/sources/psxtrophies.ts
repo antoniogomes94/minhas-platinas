@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio'
 import { fetchText } from '../http'
-import { sameName } from '../text'
+import { matchesName, searchName } from '../text'
 import { emptyResult, type ScrapeInput, type SourceResult } from '../types'
 import type { Platform } from '../../src/types'
 
@@ -38,7 +38,7 @@ export function pickSearchResult(
         total: Number(card.find('[class*="trophy-item"] h4').last().text().trim()) || null,
       }
     })
-    .filter((c) => c.href && sameName(c.title, name))
+    .filter((c) => c.href && matchesName(c.title, name))
 
   if (cards.length === 0) return null
   const onPlatform = platform ? cards.filter((c) => c.platforms.includes(PLATFORM_CHIP[platform])) : []
@@ -95,7 +95,7 @@ export function parseGamePage(html: string, url: string): SourceResult {
 export async function scrapePsxTrophies(input: ScrapeInput, expectedTotal?: number | null): Promise<SourceResult> {
   const url =
     input.urls.psxtrophies ??
-    pickSearchResult(await fetchText(searchUrl(input.name)), input.name, input.platform, expectedTotal)
+    pickSearchResult(await fetchText(searchUrl(searchName(input.name))), input.name, input.platform, expectedTotal)
   if (!url) return { ...emptyResult('psxtrophies'), error: 'Jogo não encontrado na busca' }
   return parseGamePage(await fetchText(url), url)
 }

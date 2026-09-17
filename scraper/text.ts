@@ -21,6 +21,26 @@ export function textLines($: CheerioAPI, selector: Parameters<CheerioAPI>[0]): s
 
 export const sameName = (a: string, b: string) => slugify(a) === slugify(b)
 
+const EDITION_SUFFIX =
+  /\s*[-–:]?\s*(?:director'?s cut|game of the year edition|goty edition|goty|complete edition|definitive edition|(?:digital )?deluxe edition|standard edition|ultimate edition|legendary edition|enhanced edition|anniversary edition)\s*$/i
+
+/**
+ * Nomes do RAWG às vezes trazem ano ou edição; os sites de troféus usam o nome base.
+ * "God of War (2018)" -> ["God of War (2018)", "God of War"]
+ * "Ghost of Tsushima Director's Cut" -> ["Ghost of Tsushima Director's Cut", "Ghost of Tsushima"]
+ */
+export function nameVariants(name: string): string[] {
+  const full = name.trim()
+  const withoutYear = full.replace(/\s*\((?:19|20)\d{2}\)\s*$/, '').trim()
+  const withoutEdition = withoutYear.replace(EDITION_SUFFIX, '').trim()
+  return [...new Set([full, withoutYear, withoutEdition])].filter(Boolean)
+}
+
+/** Nome usado nas buscas dos sites (sem o ano entre parênteses). */
+export const searchName = (name: string) => nameVariants(name).at(-1)!
+
+export const matchesName = (candidate: string, name: string) => nameVariants(name).some((v) => sameName(candidate, v))
+
 export function decodeEntities(s: string): string {
   return s
     .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))

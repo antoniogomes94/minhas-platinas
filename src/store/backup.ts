@@ -8,6 +8,22 @@ const gameSchema = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),
   platform: z.enum(PLATFORMS).optional(),
+  catalog: z
+    .object({
+      source: z.literal('rawg'),
+      id: z.number(),
+      slug: z.string(),
+      name: z.string(),
+      released: z.string().nullable(),
+      image: z.string().nullable(),
+      developers: z.array(z.string()),
+      publishers: z.array(z.string()),
+      genres: z.array(z.string()),
+      platforms: z.array(z.enum(PLATFORMS)),
+      metacritic: z.number().nullable(),
+      website: z.string().nullable(),
+    })
+    .optional(),
   coverUrl: z.string().optional(),
   sourceUrls: z.partialRecord(z.enum(SOURCE_SITES), z.string()).optional(),
   fetch: z
@@ -30,6 +46,7 @@ const stateSchema = z.object({
     githubOwner: z.string(),
     githubRepo: z.string(),
     githubToken: z.string().optional(),
+    rawgKey: z.string().optional(),
   }),
 })
 
@@ -39,9 +56,13 @@ const backupSchema = z.object({
   data: stateSchema,
 })
 
-export function createBackup(state: PersistedState, includeToken = false): string {
+/** Por padrão o backup não leva as chaves (token do GitHub e chave do RAWG). */
+export function createBackup(state: PersistedState, includeKeys = false): string {
   const settings = { ...state.settings }
-  if (!includeToken) delete settings.githubToken
+  if (!includeKeys) {
+    delete settings.githubToken
+    delete settings.rawgKey
+  }
   const payload = {
     app: BACKUP_APP,
     exportedAt: new Date().toISOString(),

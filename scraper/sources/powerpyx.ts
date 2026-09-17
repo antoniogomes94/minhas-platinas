@@ -9,13 +9,16 @@ import {
   parseDifficulty,
   parseHours,
   parseYesNo,
-  sameName,
+  matchesName,
+  nameVariants,
+  searchName,
   shortSummary,
   splitSentences,
   youtubeIdsFromHtml,
 } from '../text'
 import { emptyResult, type ScrapeInput, type SourceResult } from '../types'
 import type { Tip } from '../../src/types'
+import { slugify } from '../../src/lib/slug'
 
 const API = 'https://www.powerpyx.com/wp-json/wp/v2/posts'
 const MAX_TIPS = 6
@@ -36,7 +39,7 @@ export function pickSearchResult(posts: WpPost[], name: string): string | null {
     const title = decodeEntities(post.title.rendered)
     if (!/trophy guide/i.test(title)) continue
     const base = title.replace(/\s*trophy guide.*$/i, '').replace(/\s*[-–:]\s*$/, '')
-    if (sameName(base, name)) return post.slug
+    if (matchesName(base, name)) return post.slug
   }
   return null
 }
@@ -48,11 +51,12 @@ export async function findPost(input: ScrapeInput): Promise<WpPost | null> {
     if (!slug) return null
     return (await fetchJson<WpPost[]>(bySlug(slug)))[0] ?? null
   }
-  for (const candidate of [`${input.slug}-trophy-guide-roadmap`, `${input.slug}-trophy-guide`]) {
+  const slugs = [...new Set([input.slug, ...nameVariants(input.name).map(slugify)])]
+  for (const candidate of slugs.flatMap((slug) => [`${slug}-trophy-guide-roadmap`, `${slug}-trophy-guide`])) {
     const post = (await fetchJson<WpPost[]>(bySlug(candidate)))[0]
     if (post) return post
   }
-  const search = `${API}?search=${encodeURIComponent(`${input.name} trophy guide`)}&per_page=20&_fields=slug,link,title`
+  const search = `${API}?search=${encodeURIComponent(`${searchName(input.name)} trophy guide`)}&per_page=20&_fields=slug,link,title`
   const slug = pickSearchResult(await fetchJson<WpPost[]>(search), input.name)
   return slug ? ((await fetchJson<WpPost[]>(bySlug(slug)))[0] ?? null) : null
 }

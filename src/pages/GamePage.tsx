@@ -16,6 +16,7 @@ import {
   Pencil,
   RefreshCw,
   Sparkles,
+  Star,
   TriangleAlert,
   Video,
 } from 'lucide-react'
@@ -24,6 +25,8 @@ import { toast } from '../store/useToastStore'
 import { useGameInfo } from '../lib/gameData'
 import { actionsUrl, useStartScrape } from '../lib/github'
 import { Cover } from '../components/Cover'
+import { rawgGameUrl } from '../lib/rawg'
+import { coverOf } from '../lib/cover'
 import {
   difficultyColor,
   FetchStatusChip,
@@ -36,6 +39,7 @@ import {
 import {
   BACKLOG_LIMIT,
   SITE_LABELS,
+  type CatalogInfo,
   SOURCE_SITES,
   type Field,
   type Game,
@@ -139,28 +143,42 @@ function GuidesPanel({ guides }: { guides: LinkItem[] }) {
   )
 }
 
-function InfoView({ info }: { info: GameInfo }) {
+/** Developer/Publisher: dado coletado dos sites; se não houver, o do cadastro (RAWG). */
+function DevelopmentPanel({ info, catalog }: { info: GameInfo | null; catalog?: CatalogInfo }) {
+  const row = (label: string, field: Field<string[]> | undefined, fallback: string[] | undefined) => {
+    const scraped = field?.value?.length ? field : null
+    const values = scraped ? scraped.value! : (fallback ?? [])
+    return (
+      <div>
+        <dt className="text-xs text-muted uppercase">{label}</dt>
+        <dd className="flex flex-wrap items-center gap-2">
+          {values.length ? values.join(', ') : DASH}
+          {scraped?.site ? <SourceBadge site={scraped.site} /> : values.length > 0 && <SourceBadge site="rawg" />}
+        </dd>
+      </div>
+    )
+  }
+  return (
+    <Panel title="Desenvolvimento" icon={Building2}>
+      <dl className="space-y-3 text-sm">
+        {row('Developer', info?.developers, catalog?.developers)}
+        {row('Publisher', info?.publishers, catalog?.publishers)}
+        {catalog?.released && (
+          <div>
+            <dt className="text-xs text-muted uppercase">Lançamento</dt>
+            <dd>{new Date(`${catalog.released}T12:00:00`).toLocaleDateString('pt-BR')}</dd>
+          </div>
+        )}
+      </dl>
+    </Panel>
+  )
+}
+
+function InfoView({ info, catalog }: { info: GameInfo; catalog?: CatalogInfo }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Panel title="Desenvolvimento" icon={Building2}>
-          <dl className="space-y-3 text-sm">
-            <div>
-              <dt className="text-xs text-muted uppercase">Developer</dt>
-              <dd className="flex flex-wrap items-center gap-2">
-                {info.developers.value?.length ? info.developers.value.join(', ') : DASH}
-                {info.developers.site && <SourceBadge site={info.developers.site} />}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs text-muted uppercase">Publisher</dt>
-              <dd className="flex flex-wrap items-center gap-2">
-                {info.publishers.value?.length ? info.publishers.value.join(', ') : DASH}
-                {info.publishers.site && <SourceBadge site={info.publishers.site} />}
-              </dd>
-            </div>
-          </dl>
-        </Panel>
+        <DevelopmentPanel info={info} catalog={catalog} />
         <div className="md:col-span-2">
           <Panel title="Resumo da platina" icon={Sparkles}>
             {info.summary.value ? (
@@ -395,12 +413,23 @@ export function GamePage() {
       </button>
 
       <header className="relative overflow-hidden rounded-2xl border border-line">
-        <Cover src={game.coverUrl || info?.cover} name={game.name} className="absolute inset-0 h-full w-full" />
+        <Cover src={coverOf(game, info)} name={game.name} className="absolute inset-0 h-full w-full" />
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-bg/30" />
         {info?.unobtainable.flag && <UnobtainableRibbon reason={info.unobtainable.reason} />}
         <div className="relative flex min-h-56 flex-col justify-end gap-3 p-5 sm:min-h-72">
           <div className="flex flex-wrap gap-2">
             {game.platform && <span className="chip">{game.platform}</span>}
+            {game.catalog?.released && <span className="chip">{game.catalog.released.slice(0, 4)}</span>}
+            {game.catalog?.genres.slice(0, 3).map((g) => (
+              <span key={g} className="chip text-muted">
+                {g}
+              </span>
+            ))}
+            {game.catalog?.metacritic != null && (
+              <span className="chip" title="Metacritic">
+                <Star size={12} className="text-warn" /> {game.catalog.metacritic}
+              </span>
+            )}
             {inBacklog && <span className="chip text-ps-light">#{backlogPos + 1} no backlog</span>}
             <FetchStatusChip fetch={game.fetch} />
           </div>
@@ -439,6 +468,15 @@ export function GamePage() {
         </div>
       </header>
 
+      {game.catalog && (
+        <p className="text-right text-xs text-muted">
+          Dados do cadastro:{' '}
+          <a href={rawgGameUrl(game.catalog.slug)} target="_blank" rel="noreferrer" className="text-ps-light hover:underline">
+            {game.catalog.name} no RAWG
+          </a>
+        </p>
+      )}
+
       {editing && (
         <Panel title="Links das fontes" icon={Pencil}>
           <EditLinksForm game={game} onDone={() => setEditing(false)} />
@@ -448,14 +486,17 @@ export function GamePage() {
       {!loaded ? (
         <p className="p-6 text-center text-sm text-muted">Carregando…</p>
       ) : info ? (
-        <InfoView info={info} />
+        <InfoView info={info} catalog={game.catalog} />
       ) : (
-        <div className="card p-10 text-center text-muted">
-          <p>Ainda não há dados coletados para este jogo.</p>
-          <p className="mt-1 text-sm">
-            Clique em <strong className="text-ink">Buscar dados</strong> para o GitHub Actions consultar PowerPyx,
-            PSNProfiles, MyPST e PSX Trophies.
-          </p>
+        <div className="space-y-4">
+          {game.catalog && <DevelopmentPanel info={null} catalog={game.catalog} />}
+          <div className="card p-10 text-center text-muted">
+            <p>Ainda não há dados coletados para este jogo.</p>
+            <p className="mt-1 text-sm">
+              Clique em <strong className="text-ink">Buscar dados</strong> para o GitHub Actions consultar PowerPyx,
+              PSNProfiles, MyPST e PSX Trophies.
+            </p>
+          </div>
         </div>
       )}
     </div>
