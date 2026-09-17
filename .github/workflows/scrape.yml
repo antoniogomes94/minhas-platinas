@@ -1,0 +1,81 @@
+name: Buscar dados de jogo
+run-name: "Buscar dados: ${{ inputs.name }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: Identificador do arquivo (ex. ghost-of-tsushima)
+        required: true
+        type: string
+      name:
+        description: Nome do jogo
+        required: true
+        type: string
+      platform:
+        description: PS5, PS4, PS3 ou PSVita (opcional)
+        required: false
+        type: string
+        default: ""
+      urls:
+        description: 'Links manuais em JSON, ex. {"powerpyx":"https://..."}'
+        required: false
+        type: string
+        default: "{}"
+
+permissions:
+  contents: read
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      # Inputs passam por variáveis de ambiente (nunca interpolados no script) e o CLI valida o slug.
+      - name: Coletar dados
+        env:
+          GAME_NAME: ${{ inputs.name }}
+          GAME_SLUG: ${{ inputs.slug }}
+          GAME_PLATFORM: ${{ inputs.platform }}
+          GAME_URLS: ${{ inputs.urls }}
+        run: npm run scrape -- --name "$GAME_NAME" --slug "$GAME_SLUG" --platform "$GAME_PLATFORM" --urls "$GAME_URLS"
+
+      - name: Salvar no repositório
+        env:
+          GAME_NAME: ${{ inputs.name }}
+          GAME_SLUG: ${{ inputs.slug }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "public/data/games/${GAME_SLUG}.json"
+          if git diff --cached --quiet; then
+            echo "Nada mudou."
+            exit 0
+          fi
+          git commit -m "dados: ${GAME_NAME}"
+          # Outras coletas podem ter feito push ao mesmo tempo; cada jogo tem seu arquivo, então o rebase não conflita.
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            sleep $((attempt * 5))
+          done
+          echo "Não foi possível fazer push depois de 3 tentativas."
+          exit 1
+
+  deploy:
+    needs: scrape
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
