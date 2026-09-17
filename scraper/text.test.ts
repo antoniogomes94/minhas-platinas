@@ -103,3 +103,13 @@ it('youtubeIdsFromHtml sem duplicados', () => {
     '<iframe src="//www.youtube.com/embed/DgizIkHiycY"></iframe><iframe src="https://www.youtube.com/embed/DgizIkHiycY?feature=oembed"></iframe><iframe src="https://www.youtube-nocookie.com/embed/yiY906xMa8E"></iframe>'
   expect(youtubeIdsFromHtml(html)).toEqual(['DgizIkHiycY', 'yiY906xMa8E'])
 })
+
+describe('describeError', async () => {
+  const { describeError, HttpError } = await import('./http')
+  it('mostra a causa da falha de conexão', () => {
+    const err = new TypeError('fetch failed', { cause: Object.assign(new Error('connect'), { code: 'ECONNRESET' }) })
+    expect(describeError(err)).toBe('Falha de conexão (ECONNRESET)')
+    expect(describeError(new HttpError(403, 'https://x'))).toBe('HTTP 403 em https://x')
+    expect(describeError(new DOMException('t', 'TimeoutError'))).toBe('Tempo esgotado ao acessar o site')
+  })
+})

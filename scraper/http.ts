@@ -16,6 +16,19 @@ export class HttpError extends Error {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
+/** Mensagem curta com a causa real ("fetch failed" sozinho não ajuda a diagnosticar). */
+export function describeError(err: unknown): string {
+  if (err instanceof HttpError) return err.message
+  if (err instanceof Error) {
+    if (err.name === 'TimeoutError') return 'Tempo esgotado ao acessar o site'
+    const cause = err.cause as { code?: string; message?: string; errors?: { code?: string }[] } | undefined
+    const detail = cause?.code ?? cause?.errors?.[0]?.code ?? cause?.message
+    if (err.message === 'fetch failed') return `Falha de conexão${detail ? ` (${detail})` : ''}`
+    return detail ? `${err.message} (${detail})` : err.message
+  }
+  return String(err)
+}
+
 /** No máximo 1 requisição por segundo para cada site. */
 async function throttle(url: string) {
   const host = new URL(url).host

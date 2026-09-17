@@ -80,6 +80,8 @@ describe('MyPST', () => {
     expect(mypst.guideTitleGame('Returnal - Guia de Troféus')).toBe('Returnal')
     expect(mypst.guideTitleGame('[Finalizado] Syberia The World Before - Guia de troféus')).toBe('Syberia The World Before')
     expect(mypst.guideTitleGame('Kena: Bridge of Spirits - Guia de Troféus (PS5/PS4)')).toBe('Kena: Bridge of Spirits')
+    expect(mypst.guideTitleGame('Guia de Troféus - Granblue Fantasy: Versus')).toBe('Granblue Fantasy: Versus')
+    expect(mypst.guideTitleGame('Guia de Troféus - Astro Bot (PS5)')).toBe('Astro Bot')
     expect(mypst.guideTitleGame('[Exophase] Lista de Troféus - Returnal')).toBeNull()
   })
 

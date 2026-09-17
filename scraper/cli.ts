@@ -10,6 +10,7 @@ import { scrapeMypst } from './sources/mypst'
 import { scrapePowerPyx } from './sources/powerpyx'
 import { scrapePsxTrophies } from './sources/psxtrophies'
 import { channelVideoLinks, describeVideos, mapLinks, otherGuideLinks, psnProfilesLinks } from './sources/links'
+import { describeError } from './http'
 import { emptyResult, type ScrapeInput, type SourceResult } from './types'
 
 function fail(message: string): never {
@@ -63,8 +64,7 @@ async function safely(site: SourceSite, run: () => Promise<SourceResult>): Promi
   try {
     return await run()
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err)
-    return { ...emptyResult(site), error: message.slice(0, 200) }
+    return { ...emptyResult(site), error: describeError(err).slice(0, 200) }
   }
 }
 

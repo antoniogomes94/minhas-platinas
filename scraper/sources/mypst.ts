@@ -23,11 +23,16 @@ const MAX_TIPS = 6
 export const searchUrl = (name: string) =>
   `${FORUM}?/search/&q=${encodeURIComponent(name)}&type=forums_topic&search_in=titles`
 
-/** "[Finalizado] Kena: Bridge of Spirits - Guia de Troféus (PS5/PS4)" -> "Kena: Bridge of Spirits" */
+/**
+ * "[Finalizado] Kena: Bridge of Spirits - Guia de Troféus (PS5/PS4)" -> "Kena: Bridge of Spirits"
+ * "Guia de Troféus - Granblue Fantasy: Versus" -> "Granblue Fantasy: Versus"
+ */
 export function guideTitleGame(title: string): string | null {
   const clean = title.replace(/^(\s*\[[^\]]*\]\s*)+/, '').trim()
-  const m = clean.match(/^(.*?)\s*[-–|:]\s*guia de trof[eé]us\b/i)
-  return m ? m[1]!.trim() : null
+  const suffix = clean.match(/^(.*?)\s*[-–|:]\s*guia de trof[eé]us\b/i)
+  if (suffix?.[1]) return suffix[1].trim()
+  const prefix = clean.match(/^guia de trof[eé]us\s*[-–|:]\s*(.+?)\s*(?:[([].*)?$/i)
+  return prefix?.[1] ? prefix[1].trim() : null
 }
 
 export function pickSearchResult(html: string, name: string): string | null {
