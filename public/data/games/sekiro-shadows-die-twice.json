@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 1,
+  "slug": "sekiro-shadows-die-twice",
+  "name": "Sekiro: Shadows Die Twice",
+  "platform": null,
+  "scrapedAt": "2026-09-17T15:58:06.713Z",
+  "cover": "https://www.powerpyx.com/wp-content/uploads/sekiro-shadows-die-twice-wallpaper.jpg",
+  "developers": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "publishers": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "summary": {
+    "value": "The platinum for this game wants you to get 100% completion: see all endings, beat all optional bosses, and find all upgrade items in the game. It’s an open world and you can fast travel between areas at any time. Search all areas carefully for there are many upgrade items to be found.",
+    "site": "powerpyx",
+    "readings": [
+      {
+        "site": "powerpyx",
+        "value": "The platinum for this game wants you to get 100% completion: see all endings, beat all optional bosses, and find all upgrade items in the game. It’s an open world and you can fast travel between areas at any time. Search all areas carefully for there are many upgrade items to be found."
+      }
+    ]
+  },
+  "autopop": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "difficulty": {
+    "value": 7,
+    "site": "powerpyx",
+    "readings": [
+      {
+        "site": "powerpyx",
+        "value": 7,
+        "raw": "7/10"
+      }
+    ]
+  },
+  "communityDifficulty": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "timeHours": {
+    "value": {
+      "min": 50,
+      "max": 50
+    },
+    "site": "powerpyx",
+    "readings": [
+      {
+        "site": "powerpyx",
+        "value": {
+          "min": 50,
+          "max": 50
+        },
+        "raw": "50 hours+ (depending on skill)"
+      }
+    ]
+  },
+  "offlineTrophies": {
+    "value": 34,
+    "site": "powerpyx",
+    "readings": [
+      {
+        "site": "powerpyx",
+        "value": 34,
+        "raw": "34 (1, 4, 11, 18)"
+      }
+    ]
+  },
+  "onlineTrophies": {
+    "value": 0,
+    "site": "powerpyx",
+    "readings": [
+      {
+        "site": "powerpyx",
+        "value": 0,
+        "raw": "0"
+      }
+    ]
+  },
+  "missableTrophies": {
+    "value": 16,
+    "site": "powerpyx",
+    "readings": [
+      {
+        "site": "powerpyx",
+        "value": 16,
+        "raw": "16 (Man Without Equal, Ashina Traveler, Peak Physical Strength, Immortal Severance, Purification, Dragon’s Homecoming, Shura, Sword Saint, Isshin Ashina, Great Shinobi – Owl, Father Surpassed, Corrupted Monk, Gracious Gift of Tears, Isshin Ashina, Demon of Hatred, Great Colored Carp)"
+      }
+    ]
+  },
+  "glitchedTrophies": {
+    "value": 0,
+    "site": "powerpyx",
+    "readings": [
+      {
+        "site": "powerpyx",
+        "value": 0,
+        "raw": "0"
+      }
+    ]
+  },
+  "difficultyAffects": {
+    "value": null,
+    "site": null,
+    "readings": []
+  },
+  "playthroughs": {
+    "value": 2,
+    "site": "powerpyx",
+    "readings": [
+      {
+        "site": "powerpyx",
+        "value": 2,
+        "raw": "2 (only with save game backups, 4 playthroughs without)"
+      }
+    ]
+  },
+  "unobtainable": {
+    "flag": false,
+    "reason": null,
+    "notes": []
+  },
+  "tips": [
+    {
+      "kind": "macete",
+      "text": "PS4 Savefile Backup: Go to PS4 Settings > Application Saved Data Management > Copy to USB or PS+ Cloud (if you use PS+ Cloud make sure you disable auto-uploads for Sekiro or else it will overwrite your backup save automatically).",
+      "site": "powerpyx",
+      "url": "https://www.powerpyx.com/sekiro-shadows-die-twice-trophy-guide-roadmap/"
+    },
+    {
+      "kind": "macete",
+      "text": "After each ending you will need to restore the backup save (copy it from USB / PS+ back to PS4).",
+      "site": "powerpyx",
+      "url": "https://www.powerpyx.com/sekiro-shadows-die-twice-trophy-guide-roadmap/"
+    }
+  ],
+  "guides": [
+    {
+      "site": "PSNProfiles",
+      "title": "Buscar lista de troféus",
+      "url": "https://psnprofiles.com/search/games?q=Sekiro%3A%20Shadows%20Die%20Twice",
+      "lang": "en"
+    },
+    {
+      "site": "PSNProfiles",
+      "title": "Buscar guias",
+      "url": "https://psnprofiles.com/search/guides?q=Sekiro%3A%20Shadows%20Die%20Twice",
+      "lang": "en"
+    },
+    {
+      "site": "PowerPyx",
+      "title": "Sekiro Shadows Die Twice Trophy Guide & Roadmap",
+      "url": "https://www.powerpyx.com/sekiro-shadows-die-twice-trophy-guide-roadmap/",
+      "lang": "en"
+    },
+    {
+      "site": "PlayStationTrophies",
+      "title": "Buscar guia",
+      "url": "https://www.playstationtrophies.org/search/?q=Sekiro%3A%20Shadows%20Die%20Twice",
+      "lang": "en"
+    },
+    {
+      "site": "TrueTrophies",
+      "title": "Buscar guia",
+      "url": "https://www.truetrophies.com/searchresults.aspx?search=Sekiro%3A%20Shadows%20Die%20Twice",
+      "lang": "en"
+    },
+    {
+      "site": "Reddit r/Trophies",
+      "title": "Discussões",
+      "url": "https://www.reddit.com/r/Trophies/search/?q=Sekiro%3A%20Shadows%20Die%20Twice&restrict_sr=1",
+      "lang": "en"
+    }
+  ],
+  "videos": [
+    {
+      "channel": "PowerPyx",
+      "url": "https://www.youtube.com/watch?v=oxVby95UWxA",
+      "title": "Sekiro Shadows Die Twice - All Prosthetic Tools Locations (Weapons)"
+    },
+    {
+      "channel": "PowerPyx",
+      "url": "https://www.youtube.com/watch?v=1tns95e4Vc8",
+      "title": "Sekiro Shadows Die Twice - All Prayer Bead Locations (Health & Posture Upgrades)"
+    },
+    {
+      "channel": "PowerPyx",
+      "url": "https://www.youtube.com/watch?v=BvBTYJi4cgE",
+      "title": "Sekiro Shadows Die Twice - All Gourd Seed Locations (Ultimate Healing Gourd Trophy Guide)"
+    },
+    {
+      "channel": "PowerPyx",
+      "url": "https://www.youtube.com/watch?v=Wj3fDkTZbxE",
+      "title": "Sekiro Shadows Die Twice - Isshin, the Sword Saint Boss Fight - Easy Way (Immortal Severance Ending)"
+    },
+    {
+      "channel": "PowerPyx",
+      "url": "https://www.youtube.com/watch?v=5OaXKLG11KQ",
+      "title": "Sekiro Shadows Die Twice - Where to find Shop Merchant (Memorial Mob Trophy / Achievement Guide)"
+    },
+    {
+      "channel": "PowerPyx",
+      "url": "https://www.youtube.com/watch?v=R4oZdG7CZaI",
+      "title": "Sekiro Shadows Die Twice - Gyoubu Oniwa Boss Fight (Boss #4)"
+    },
+    {
+      "channel": "PowerPyx",
+      "url": "https://www.youtube.com/watch?v=03UYVTh9i6c",
+      "title": "Sekiro Shadows Die Twice - Lady Butterfly Boss Fight (Boss #7)"
+    },
+    {
+      "channel": "PowerPyx",
+      "url": "https://www.youtube.com/watch?v=W8-2Hm_XNU4",
+      "title": "Sekiro Shadows Die Twice - Genichiro Ashina & Way of the Tomoe Boss Fight (Boss #13)"
+    },
+    {
+      "channel": "PowerPyx",
+      "url": "https://www.youtube.com/@PowerPyx/search?query=Sekiro%3A%20Shadows%20Die%20Twice",
+      "title": "Buscar no canal"
+    },
+    {
+      "channel": "Dan Allen Gaming",
+      "url": "https://www.youtube.com/@DanAllenGaming/search?query=Sekiro%3A%20Shadows%20Die%20Twice",
+      "title": "Buscar no canal"
+    },
+    {
+      "channel": "YouTube (PT-BR)",
+      "url": "https://www.youtube.com/results?search_query=Sekiro%3A%20Shadows%20Die%20Twice%20guia%20de%20trof%C3%A9us%20platina",
+      "title": "Buscar \"guia de troféus\""
+    },
+    {
+      "channel": "YouTube (EN)",
+      "url": "https://www.youtube.com/results?search_query=Sekiro%3A%20Shadows%20Die%20Twice%20trophy%20guide",
+      "title": "Buscar \"trophy guide\""
+    }
+  ],
+  "maps": [],
+  "sources": [
+    {
+      "site": "powerpyx",
+      "url": "https://www.powerpyx.com/sekiro-shadows-die-twice-trophy-guide-roadmap/",
+      "ok": true
+    },
+    {
+      "site": "psnprofiles",
+      "url": null,
+      "ok": false,
+      "error": "Bloqueia coleta automática (Cloudflare). Use os links."
+    },
+    {
+      "site": "mypst",
+      "url": null,
+      "ok": false,
+      "error": "Nenhum \"Guia de Troféus\" no fórum"
+    },
+    {
+      "site": "psxtrophies",
+      "url": null,
+      "ok": false,
+      "error": "fetch failed"
+    }
+  ]
+}
